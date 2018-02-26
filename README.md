@@ -78,8 +78,7 @@ Go to the url
 	http(s)://<yourdomain>/futuretest/ui
 	
 and you'll see the UI:
-
-![IM Future Test screenshot](https://lh6.googleusercontent.com/Q5XUfYdQ6ZkJSjSFdcDz5AQieAv7c-f_pwrVBtFuv0p_UC46yBh5ijC1SL8qu1pgsyzJPf-hFrGV2w=w1615-h935 "IM Future Test screenshot")
+![IM Future Test screenshot](http://i433.photobucket.com/albums/qq59/emlynoregan/im_futuretest.png "IM Future Test screenshot")
 
 
  
