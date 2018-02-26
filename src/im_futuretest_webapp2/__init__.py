@@ -6,6 +6,7 @@ from im_futuretest import get_test_by_name, get_tests, get_testrun_by_id,\
 import json
 import logging
 import mimetypes
+from google.appengine.ext import ndb
 
 _base_route = "futuretest"
 
@@ -22,6 +23,7 @@ def addroutes_futuretest_webapp2(routes):
         (_create_route("ui/"), WebRootHandler),
         (_create_route("ui/static/(.*)"), WebStaticHandler),
         (_create_route("tests"), TestsAPIHandler),
+        (_create_route("future"), FutureAPIHandler),
         (_create_route("runs"), TestRunsAPIHandler)
     ])
     
@@ -166,3 +168,31 @@ class TestRunsAPIHandler(webapp2.RequestHandler):
             self.response.out.write("unknown action %s" % laction)
             return
 
+class FutureAPIHandler(webapp2.RequestHandler):
+    def get(self):
+        lfutureKeyUrlSafe = self.request.get('futurekey')
+        lincludeChildren = self.request.get('include_children')
+    
+        logging.info("lfutureKeyUrlSafe=%s" % lfutureKeyUrlSafe)
+        logging.info("lincludeChildren=%s" % lincludeChildren)
+        
+        lfutureKey = ndb.Key(urlsafe = lfutureKeyUrlSafe)
+        
+        lfuture = lfutureKey.get()
+        
+        def keymap(future, level):
+            return future.key.urlsafe()
+                
+        lfutureJson = lfuture.to_dict(maxlevel=2 if lincludeChildren else 1, futuremapf = keymap) if lfuture else None
+        
+        if lfutureJson:
+            lfutureJson["futurekey"] = lfutureJson["key"]
+            del lfutureJson["key"]
+    
+            lchildren = lfutureJson.get("zchildren") or [];
+            for lchild in lchildren:
+                lchild["futurekey"] = lchild["key"]
+                del lchild["key"]
+            
+        self.response.headers.add("Content-Type", "application/json")
+        self.response.out.write(json.dumps(lfutureJson, indent=2))
